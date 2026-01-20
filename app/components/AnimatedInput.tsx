@@ -65,7 +65,7 @@ const AnimatedInput: React.FC<AnimatedInputProps> = ({
     left: value ? 0 : 12,
     top: animatedValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [12, -23],
+      outputRange: [15, -23],
     }),
     fontSize: animatedValue.interpolate({
       inputRange: [0, 1],

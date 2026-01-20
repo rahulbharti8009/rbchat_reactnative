@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Props } from './HomeUI'
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View , PermissionsAndroid,Platform, Image } from 'react-native'
 import { useAppSelector } from '../redux/hook/hook'
 import CustomHeader from '../components/CustomHeader'
 import CustomProfileHeader from '../components/CustomProfileHeader'
@@ -14,10 +14,15 @@ import { ProfilePayload } from '../utils/types'
 import { postApi } from '../types/genericType'
 import { User } from '../types/auth'
 import { setLoginSave } from '../utils/localDB'
+import { MyCircle } from '../common/MyCircle'
+import { Icon } from '../common/ImageComp'
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
 
 export const ProfileUI: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useAppSelector((state) => state.auth.user)
+  const [image, setImage] = useState<string  | null>(null);
 
   const { theme , themeColor } = useTheme();
   const [name, setName] = useState<string>(user?.name ?? '');
@@ -39,6 +44,97 @@ export const ProfileUI: React.FC<Props> = ({ navigation }) => {
     });
   }
 
+  const pickFromCamera = () => {
+  launchCamera(
+    {
+      mediaType: 'photo',
+      cameraType: 'front',
+      quality: 0.8,
+    },
+    (response) => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log('Camera error:', response.errorMessage);
+        return;
+      }
+      console.log('Camera Image:', response.assets?.[0]);
+      const asset = response.assets?.[0];
+      if (asset?.uri) {
+        setImage(asset.uri);
+      }
+    }
+  );
+};
+
+const pickFromGallery = () => {
+  try{
+  launchImageLibrary(
+    {
+      mediaType: 'photo',
+      quality: 0.8,
+    },
+    (response) => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log('Gallery error:', response.errorMessage);
+        return;
+      }
+      console.log('Gallery Image:', response.assets?.[0]);
+      const asset = response.assets?.[0];
+      if (asset?.uri) {
+        setImage(asset.uri);
+      }
+    }
+  );
+    }catch(error){
+            console.log('error Image:', error);
+      }
+};
+
+ const requestCameraPermission = async () => {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    const granted = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES ||
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    ]);
+
+    return (
+      granted[PermissionsAndroid.PERMISSIONS.CAMERA] ===
+        PermissionsAndroid.RESULTS.GRANTED &&
+      (granted[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
+        PermissionsAndroid.RESULTS.GRANTED ||
+        granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
+        PermissionsAndroid.RESULTS.GRANTED)
+    );
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
+const openPicker = async() => {
+   const hasPermission = await requestCameraPermission();
+  if (!hasPermission) {
+    Alert.alert('Permission denied');
+    return;
+  }
+
+
+  Alert.alert(
+    'Select Photo',
+    'Choose an option',
+    [
+      { text: 'Camera', onPress: pickFromCamera },
+      { text: 'Gallery', onPress: pickFromGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ],
+    { cancelable: true }
+  );
+};
+
   const handleProfile = async () => {
     try {
       const payload: ProfilePayload = {
@@ -53,12 +149,9 @@ export const ProfileUI: React.FC<Props> = ({ navigation }) => {
       );
         setLoading(prev => prev = false)
 
-          if(data.status){
+          if(data.status) {
             await setLoginSave(data.value);
-            
               dispatch(login(data.value));
-                            // dispatch(logout());
-
               Alert.alert('Success', data.message);
           } 
     } catch (error) {
@@ -71,49 +164,74 @@ export const ProfileUI: React.FC<Props> = ({ navigation }) => {
 <CustomProfileHeader  title={`${RouteName.Profile}`} color={color} onClick={onClick}/>
                 
  <ScrollView style={[styles.container, { backgroundColor: themeColor.background }]}>
+    <View style={{ alignItems: 'center' }}>
+        <MyCircle color={user?.color} size={85}>
+              <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      openPicker()
+                      console.log('Profile clicked');
+                    }}
+                  >
+                    <Icon
+                      size={80}
+                      source={
+                              image
+                                ? { uri: image }
+                                : require('../assets/ic_profile.png')
+                            }
+                    />
+              </TouchableOpacity>
+        </MyCircle>
 
-  {/* Name */}
-  <AnimatedInput
-    label="👤 Name"
-    marginTop={10}
-    value={name}
-    onChangeText={setName}
-    maxLength={20}
-  />
 
-  {/* Mobile */}
-  <AnimatedInput
-    marginTop={10}
-    label="📞 Mobile"
-    value={user?.mobile}
-    editable={false}
-  />
+{/* <Image
+  source={require('../assets/ic_send.gif')}
+  style={{ width: 80, height: 80 }}
+/> */}
+        {/* Name */}
+        <AnimatedInput
+          label="👤 Name"
+          marginTop={10}
+          value={name}
+          onChangeText={setName}
+          maxLength={20}
+        />
 
-  {/* Color Code */}
-  <AnimatedInput
-    marginTop={10}
-    marginBottom={0}
-    label="🎨 Selected Color"
-    value={color}
-    editable={false}
-  />
+        {/* Mobile */}
+        <AnimatedInput
+          marginTop={10}
+          label="📞 Mobile"
+          value={user?.mobile}
+          editable={false}
+        />
 
-  {/* Color Preview */}
-  {/* <View style={[styles.colorPreview, { backgroundColor: color }]} /> */}
+        {/* Color Code */}
+        <AnimatedInput
+          marginTop={10}
+          marginBottom={0}
+          label="🎨 Selected Color"
+          value={color}
+          editable={false}
+        />
 
-  {/* Color Picker */}
-  <View style={styles.pickerWrapper}>
-    <ColorPicker
-      color={color}
-      onColorChangeComplete={setColor} // ✅ IMPORTANT
-      thumbSize={30}
-      sliderSize={20}
-      noSnap
-      row={false}
-      swatches
-      swatchesLast
-    />
-  </View>
+        {/* Color Preview */}
+        {/* <View style={[styles.colorPreview, { backgroundColor: color }]} /> */}
+
+        {/* Color Picker */}
+        <View style={styles.pickerWrapper}>
+          <ColorPicker
+            color={color}
+            onColorChangeComplete={setColor} // ✅ IMPORTANT
+            thumbSize={30}
+            sliderSize={20}
+            noSnap
+            row={false}
+            swatches
+            swatchesLast
+          />
+        </View>
+    </View>
 </ScrollView>
   {/* Save Button */}
   <TouchableOpacity

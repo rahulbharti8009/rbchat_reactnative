@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   ActivityIndicator,
   Animated,
@@ -30,16 +27,29 @@ type Props = {
 
 export const LoginUI: React.FC<Props> = ({ navigation }) => {
   const [mobile, setMobile] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [debouncedName, setDebouncedName] = useState('');
+
   const dispatch = useDispatch();
 
   const [isLoading, setLoading] = useState<boolean>(false);
   const [otp, setOtp] = useState<string>('');
   const {theme, themeColor } = useTheme();
 
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedName(name);
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, [name]);
+
 const handleLogin = async () => {
   try {
     const payload: LoginPayload = {
       mobile: mobile,
+      name : name
     };
     setLoading(prev => prev = true)
     const data = await postApi<User, LoginPayload>(
@@ -53,8 +63,8 @@ const handleLogin = async () => {
           setTimeout(()=>{
             dispatch(login(user));
             setLoading(prev => prev = false)
-            navigation.navigate(RouteName.Home);
-          //           navigation.replace(RouteName.Home);
+            // navigation.navigate(RouteName.Home);
+                    navigation.replace(RouteName.Home);
 
           }, 3000)
 
@@ -84,17 +94,28 @@ useEffect(() => {
   return (
       <View style={[styles.container, { flex: 1, backgroundColor: themeColor.background }]}>
 
-     <View style={{ width: '70%', height: '50%' , flexDirection:'column', paddingTop:'50%',}}>
+     <View style={{ width: '80%', height: '50%' , flexDirection:'column', paddingTop:'50%',}}>
          <AnimatedInput
           label="📞 Please enter your mobile number.😊"
           value={mobile}
+          marginBottom={18}
           onChangeText={setMobile}
           keyboardType="ascii-capable"
           maxLength={10}
         />
 
-          {mobile.length >= 10 && (
-             <View style={{marginTop: 10}}>
+        {mobile.length >= 10 && (
+           <AnimatedInput
+              label="👤 Please enter your name."
+              value={name}
+              marginTop={10}
+              marginBottom={18}
+              onChangeText={setName}
+              keyboardType="ascii-capable"
+              maxLength={20}
+        />)}
+
+          {mobile.length >= 10 && debouncedName.length > 2 && (
                     <AnimatedInput
                         label="🔐 Enter OTP"
                         value={otp}
@@ -104,7 +125,6 @@ useEffect(() => {
                         marginTop={10}
                         maxLength={4}
                       />
-             </View>
            )}
           
      </View>

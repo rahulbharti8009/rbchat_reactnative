@@ -1,6 +1,7 @@
 
 export interface LoginPayload {
     mobile: string;
+    name?: string;
   }
   
   export interface Chat {

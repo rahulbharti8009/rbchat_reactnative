@@ -102,10 +102,10 @@ const ChatHistoryUI = () => {
     checkIsUnread()
     socket?.on(`unread${auth?.mobile}`, (user: any) => {
       if(user != undefined){
-        ToastAndroid.show(
-          `Sender: ${user.sender}, Online: ${user.isUnread}`,
-          ToastAndroid.SHORT
-        );
+        // ToastAndroid.show(
+        //   `Sender: ${user.sender}, Online: ${user.isUnread}`,
+        //   ToastAndroid.SHORT
+        // );
       setIsRecieverUnread(()=> user.isUnread)
 
       }
