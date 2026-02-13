@@ -25,6 +25,9 @@ class MySocket {
     if(!this.socket){
       this.socket = io(SOCKET_URL, {
         transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
         autoConnect: false,
         query: {
           userId

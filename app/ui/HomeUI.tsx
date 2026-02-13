@@ -30,49 +30,76 @@ export const HomeUI: React.FC<Props> = ({ navigation }) => {
   const [chatType, setChatType] = useState('chat');
   const { theme , themeColor } = useTheme();
 
-  useEffect(() => {
-    const handleSocket = async () => {
-      try {
-        if (!user?.mobile) return;
+  useEffect((): (() => void) | void => {
+  if (!user?.mobile) return;
 
-        const mobile =  user?.mobile
-        const chat_list = `chat_list${user?.mobile}`;
-        const invite_list = `invite_list${user?.mobile}`;
+  const mobile: string = user.mobile;
+  const chat_list: string = `chat_list${mobile}`;
+  const invite_list: string = `invite_list${mobile}`;
 
-        const socket = MySocket.getInstance().createSocket(user.mobile);
-        if (!socket.connected) socket.connect();
-        // chat list
-        socket.emit('getchatList', {
-          mobile : mobile
-        });
-        const handleChatList = (data: Chat[]) => {
-          console.log('getchatList list:', data);
-          setChatList(data);
-          setlaoding(()=> false);
-        };
-        socket.on(chat_list, handleChatList);
- // invite list        
-        socket.emit('getInviteList', {
-          mobile : mobile
-        });
-        const handleInviteList = (data: Invite[]) => {
-          console.log('getInviteList list:', data);
-          setInviteList(data);
-        };
-        socket.on(invite_list, handleInviteList);
-        return () => {
-          socket.off(chat_list, handleChatList);
-          socket.off(invite_list, handleInviteList);
+  const socket = MySocket.getInstance().createSocket(mobile);
 
-          socket.disconnect(); 
-        };
-      } catch (error) {
-        console.error('getchatList error', error);
-        setlaoding(()=> false);
-      }
+  try {
+    // 🔥 CONNECT LISTENERS
+    const handleConnect = (): void => {
+      console.log('✅ Connected:', socket.id);
+
+      socket.emit('getchatList', { mobile });
+      socket.emit('getInviteList', { mobile });
     };
-    handleSocket();
-  }, []);
+
+    const handleDisconnect = (reason: string): void => {
+      console.log('❌ Disconnected:', reason);
+    };
+
+    const handleConnectError = (error: Error): void => {
+      console.log('🚨 Connection Error:', error.message);
+      setlaoding(false);
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('connect_error', handleConnectError);
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    // 🔥 DATA LISTENERS
+    const handleChatList = (data: Chat[]): void => {
+      console.log('Chat List:', data);
+      setChatList(data ?? []);
+      setlaoding(false);
+    };
+
+    const handleInviteList = (data: Invite[]): void => {
+      console.log('Invite List:', data);
+      setInviteList(data ?? []);
+    };
+
+    socket.on(chat_list, handleChatList);
+    socket.on(invite_list, handleInviteList);
+
+    // 🔥 CLEANUP
+    return (): void => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('connect_error', handleConnectError);
+
+      socket.off(chat_list, handleChatList);
+      socket.off(invite_list, handleInviteList);
+
+      socket.disconnect();
+    };
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log('Unexpected error:', error.message);
+    }
+    setlaoding(false);
+  }
+
+}, [user?.mobile]);
 
   const ComponentType = () => {
     switch (chatType) {
