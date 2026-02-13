@@ -46,6 +46,8 @@ useEffect(() => {
 }, [name]);
 
 const handleLogin = async () => {
+    navigation.navigate(RouteName.Demo);
+  return
   try {
     const payload: LoginPayload = {
       mobile: mobile,
@@ -72,7 +74,7 @@ const handleLogin = async () => {
           
         }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 

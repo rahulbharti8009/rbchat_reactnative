@@ -6,12 +6,21 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
 import MySocket from '../utils/socket';
 import { useAppSelector } from '../redux/hook/hook';
+import { Icon } from '../common/ImageComp';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../utils/types';
+import { RouteName } from '../utils/enum';
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  RouteName.AudioCall
+>;
 
 const CustomChattingHeader = ({ title, online  }: {title: string,online: string}) => {
     const { theme, toggleTheme, themeColor } = useTheme();
     const auth = useAppSelector((state) => state.auth.user)
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const mySocket = MySocket.getInstance();
   const socket = mySocket.getSocket();
   const checkIsUnread=()=> {

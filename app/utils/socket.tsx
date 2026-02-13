@@ -46,7 +46,7 @@ class MySocket {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
-      log('socket', 'disconnected');
+      // log('socket', 'disconnected');
     }
   }
 }

@@ -14,6 +14,9 @@ import { login } from '../redux/slice/authSlice';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../redux/hook/hook';
 import { ProfileUI } from '../ui/Profile';
+import AudioUI  from '../ui/AudioUI';
+import { DemoUI } from '../ui/demo';
+import { PerentUI } from '../ui/Parent';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,7 +44,8 @@ export const MyStack = () => {
     <NavigationContainer>
     <Stack.Navigator
       screenOptions={{ headerShown: false, animation: 'slide_from_right', }}
-      initialRouteName={user != null ? RouteName.Home : RouteName.Login}
+      // initialRouteName={user != null ? RouteName.Home : RouteName.Login}
+      initialRouteName={RouteName.Perent}
     >
       <Stack.Screen name={RouteName.Login} component={LoginUI} />
       <Stack.Screen name={RouteName.Home} component={HomeUI} />
@@ -52,6 +56,11 @@ export const MyStack = () => {
       <Stack.Screen name={RouteName.ChatHistory} component={ChatHistoryUI} />
       <Stack.Screen name={RouteName.AddGroupUI} component={AddGroupUI} />
       <Stack.Screen name={RouteName.VideoCall} component={VideoCall} />
+      <Stack.Screen name={RouteName.AudioCall} component={AudioUI} />
+      <Stack.Screen name={RouteName.Demo} component={DemoUI} />
+      <Stack.Screen name={RouteName.Perent} component={PerentUI} />
+
+
     </Stack.Navigator>
     </NavigationContainer>
   );

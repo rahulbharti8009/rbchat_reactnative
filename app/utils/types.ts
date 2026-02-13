@@ -8,6 +8,8 @@ export type RootStackParamList = {
     ChatHistory : {user: Chat};
     AddGroupUI : undefined;
     VideoCall: {}
+    AudioCall:{user: Chat};
+    Demo: undefined;
   };
 
   export type ChatUser = {

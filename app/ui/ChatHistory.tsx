@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { use, useCallback, useEffect, useRef, useState } from 'react';
 import { ChatHistoryPayload, ChatMessage, ChatUser, RootStackParamList } from '../utils/types';
 import {
   Alert,
@@ -14,17 +14,24 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import MySocket from '../utils/socket';
 import { useTheme } from '../theme/ThemeContext';
 import CustomChattingHeader from '../components/CustomChattingHeader';
 import { useAppSelector } from '../redux/hook/hook';
 import { RouteName } from '../utils/enum';
 import { postApi } from '../types/genericType';
+import { Icon } from '../common/ImageComp';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type ChatRouteProp = RouteProp<
   RootStackParamList,
   RouteName.ChatHistory
+>;
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  RouteName.AudioCall
 >;
 
 /* ---------------- COMPONENT ---------------- */
@@ -40,6 +47,7 @@ const ChatHistoryUI = () => {
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const { theme, toggleTheme, themeColor } = useTheme();
   const flatListRef = useRef<FlatList<ChatMessage>>(null);
+  const navigation = useNavigation<NavigationProp>();
 
   useFocusEffect(
     useCallback(() => {
@@ -165,6 +173,17 @@ const ChatHistoryUI = () => {
       <CustomChattingHeader
         title={`${user.mobile}`} online={isRecieverUnread ? 'online': 'offline'}
       />
+        <TouchableOpacity style={{position:'absolute', alignSelf:"flex-end", margin: 10}} onPress={() => {
+           navigation.navigate(RouteName.AudioCall, { user: user });
+            console.log('theme')}}>
+            <View style={[{padding: 0}]}>
+                <Icon
+                  source={require('../assets/ic_call.png') }
+                  size={30}
+                  tintColor={theme === 'dark' ? themeColor.white: themeColor.black}
+                /> 
+              </View>
+            </TouchableOpacity>
 
           <FlatList
               ref={flatListRef} 

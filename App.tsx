@@ -1,4 +1,4 @@
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { Linking, StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { store } from './app/redux/store/store';
 import { ThemeProvider, useTheme } from './app/theme/ThemeContext';
 import { useAppSelector } from './app/redux/hook/hook';
+import { useEffect } from 'react';
 
 function AppContent() {
   const { theme , themeColor} = useTheme();

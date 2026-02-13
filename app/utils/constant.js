@@ -1,4 +1,4 @@
-const ip= '10.183.5.147'
+const ip= '10.11.127.147'
 export const BASE_URL = `http://${ip}:9000/api/`    
 export const SOCKET_URL = `http://${ip}:9000`
 

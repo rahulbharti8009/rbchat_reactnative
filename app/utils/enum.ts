@@ -5,6 +5,9 @@ export enum RouteName {
     Profile = 'Profile',
     ChatHistory = 'ChatHistory',
     AddGroupUI = 'AddGroupUI',
-    VideoCall = 'VideoCall'
+    VideoCall = 'VideoCall',
+    AudioCall = 'AudioCall',
+    Demo = 'Demo',
+    Perent = 'PerentUI'
   }
   

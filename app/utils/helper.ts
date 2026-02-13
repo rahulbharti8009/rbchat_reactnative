@@ -1,3 +1,5 @@
+import { PermissionsAndroid, Platform } from "react-native";
+
 export const randomColor = () => {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
   };
@@ -43,3 +45,27 @@ export const getLastTime = (timestamp: number): string => {
     year: 'numeric',
   });
 };
+
+
+export const requestAudioPermission = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      {
+        title: 'Microphone Permission',
+        message: 'This app needs access to your microphone for audio calling.',
+        buttonPositive: 'OK',
+        buttonNegative: 'Cancel',
+      }
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
+
