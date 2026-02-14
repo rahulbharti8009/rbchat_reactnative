@@ -4,9 +4,9 @@ export const randomColor = () => {
 
 
   const isDebug = true
-  export const log=(tag: string, p0: string, ...args: [])=> {
+  export const log = (tag: string, token: any, ...args: [])=> {
     if(isDebug){
-      console.log(tag, args)
+      console.log(tag, token, args)
     }
   }
 

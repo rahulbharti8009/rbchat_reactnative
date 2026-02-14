@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "278355548153",
+    "project_id": "rbchat-f436f",
+    "storage_bucket": "rbchat-f436f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:278355548153:android:d0f848cae55bd6b5eacf28",
+        "android_client_info": {
+          "package_name": "com.rbchat_reactnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbtgK2NyWcaVRIvjzmxbvEMNRveY4S1UY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

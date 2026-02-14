@@ -5,7 +5,7 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+platform :ios, '16.0' #min_ios_version_supported
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -22,7 +22,11 @@ target 'rbchat_reactnative' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  # 👇 ADD THIS SECTION
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -30,5 +34,11 @@ target 'rbchat_reactnative' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+      installer.pods_project.targets.each do |target|
+       target.build_configurations.each do |config|
+       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+       end
+     end
   end
+
 end

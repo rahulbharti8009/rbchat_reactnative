@@ -14,6 +14,7 @@ import { login } from '../redux/slice/authSlice';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../redux/hook/hook';
 import { ProfileUI } from '../ui/Profile';
+import { flushPendingNavigation, navigationRef } from './navigationRef';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,7 +39,9 @@ export const MyStack = () => {
 
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}  onReady={() => {
+    flushPendingNavigation();
+  }}>
     <Stack.Navigator
       screenOptions={{ headerShown: false, animation: 'slide_from_right', }}
       initialRouteName={user != null ? RouteName.Home : RouteName.Login}

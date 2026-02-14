@@ -1,17 +1,40 @@
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { Alert, Platform, StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
 } from 'react-native-safe-area-context';
 import { MyStack } from './app/routes/stack';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { store } from './app/redux/store/store';
 import { ThemeProvider, useTheme } from './app/theme/ThemeContext';
 import { useAppSelector } from './app/redux/hook/hook';
+import messaging from '@react-native-firebase/messaging';
+import { useEffect } from 'react';
+import { log } from './app/utils/helper';
+import FirebaseMessagingService from './app/service/FirebaseMessagingService';
+import { getLoginData } from './app/utils/localDB';
+import { login } from './app/redux/slice/authSlice';
 
 function AppContent() {
   const { theme , themeColor} = useTheme();
   const user = useAppSelector((state) => state.auth.user)
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const initFCM = async () => {
+      await FirebaseMessagingService.init();
+       const savedUser = await getLoginData();
+            if (savedUser) {
+              dispatch(login(savedUser));
+            }
+
+      FirebaseMessagingService.listenTokenRefresh();
+      FirebaseMessagingService.foregroundListener();
+      FirebaseMessagingService.notificationOpenHandler(savedUser != null);
+    };
+
+    initFCM();
+  }, []);
 
   return (
     <>
